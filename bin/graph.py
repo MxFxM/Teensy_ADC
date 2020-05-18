@@ -11,27 +11,27 @@ ser.port = "COM8"
 ser.open()
 
 input_buffer = []
-
 channels = [[], [], [], []]
 
+# start time
 print(time.time())
 
 # sync
 while ser.read() != b'\x00':
     pass
 
+# sampling
 for _ in range(1000000):
     input_buffer.append(ser.read(9))
-    #print(ser.read(9))
 
+# stop time
 print(time.time())
 
-print(len(input_buffer))
-
+# store input, clear buffer
 inputs = input_buffer.copy()
 input_buffer = []
 
-
+# split data into channels
 for inp in inputs:
     try:
         for bbyte in inp:
@@ -48,18 +48,23 @@ for inp in inputs:
     except Exception as e:
         pass
 
+# plot module
 import matplotlib.pyplot as plt
 
+# median filter for all channels
 for channel in channels:
     for n in range(2, len(channel)-2):
         vals = [channel[n-2], channel[n-1], channel[n], channel[n+1], channel[n+2]]
         vals.sort()
         channel[n] = vals[2]
 
+# print length of one channel
+print(len(channels[0]))
 
-
+# plot "raw" channel
 plt.plot(channels[0])
 
+# filter 50Hz
 tabs = 5001
 freq = 50
 sample_rate = 100_000
@@ -69,8 +74,11 @@ channels[1] = signal.lfilter(tpeinh, 1, channels[1])
 channels[2] = signal.lfilter(tpeinh, 1, channels[2])
 channels[3] = signal.lfilter(tpeinh, 1, channels[3])
 
+# plot filtered channel
 plt.plot(channels[0][2500:])
 #plt.plot(channels[1])
 #plt.plot(channels[2])
 #plt.plot(channels[3])
+
+# show result
 plt.show()
