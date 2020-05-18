@@ -1,13 +1,14 @@
+import matplotlib.pyplot as plt
 import serial
 import scipy.signal as signal
 
 import time
 
 ser = serial.Serial()
-ser.baudrate = 9600 # will set automatically
+ser.baudrate = 9600  # will set automatically
 ser.bytesize = serial.EIGHTBITS
 ser.parity = serial.PARITY_NONE
-ser.port = "COM8"
+ser.port = "COM6"
 ser.open()
 
 input_buffer = []
@@ -49,7 +50,6 @@ for inp in inputs:
         pass
 
 # plot module
-import matplotlib.pyplot as plt
 
 # median filter for all channels
 for channel in channels:
@@ -62,11 +62,11 @@ for channel in channels:
 print(len(channels[0]))
 
 # plot "raw" channel
-plt.plot(channels[0])
+# plt.plot(channels[0])
 
 # filter 50Hz
 tabs = 5001
-freq = 50
+freq = 2500
 sample_rate = 100_000
 tpeinh = signal.firwin(tabs, freq, pass_zero=True, fs=sample_rate)                                 # Filterkoeffizienten berechnen
 channels[0] = signal.lfilter(tpeinh, 1, channels[0])
@@ -76,9 +76,9 @@ channels[3] = signal.lfilter(tpeinh, 1, channels[3])
 
 # plot filtered channel
 plt.plot(channels[0][2500:])
-#plt.plot(channels[1])
-#plt.plot(channels[2])
-#plt.plot(channels[3])
+plt.plot(channels[1][2500:])
+plt.plot(channels[2][2500:])
+plt.plot(channels[3][2500:])
 
 # show result
 plt.show()
